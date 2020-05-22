@@ -2,7 +2,7 @@
 OPTIONS=""
 if [ "$1" == "ap" ];
 then
-  OPTIONS="-agentpath:../../ap/build/libasyncProfiler.so=start,collapsed,file=petclinic_collapsed.txt"
+  OPTIONS="-agentpath:../../ap/build/libasyncProfiler.so=start,event=wall,collapsed,file=petclinic_collapsed.txt"
 fi
 if [ "$1" == "jfr" ];
 then
@@ -20,7 +20,7 @@ if [ "$2" == "jdk8dev" ];
 then
   export JAVA_HOME=../../jdk/jdk8dev
 fi
-if [ "$2" == "" ];
+if [ "$2" == "jdk11" ];
 then
   export JAVA_HOME=../../jdk/jdk-11.0.7+10
 fi

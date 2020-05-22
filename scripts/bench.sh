@@ -1,6 +1,7 @@
 #!/bin/bash
 INJECT_COUNT=5
 OUTPUT_FILE=out_petclinic.txt
+THREADS=2
 
 function bench () {
   if [ "$1" == "" ];
@@ -39,13 +40,33 @@ function bench () {
       echo "Application not started correctly!"
       exit 1
     fi
+
+    pidstat -r -C java 1 > mem-${TAG}-${JDK}-${I}.txt &
     echo "$(date +%H:%M:%S) Sending requests..."
-    ./inject.sh results_${TAG}-${JDK}-${I}.csv
+    pids=()
+    for FORK in $(seq $THREADS);
+    do
+      ./inject.sh results_${TAG}-${JDK}-${I}_${FORK}.csv &
+      pids[$FORK]=$!
+    done
+    for FORK in $(seq $THREADS);
+    do
+      pid=${pids[$FORK]}
+      wait $pid
+    done
+    # grab user & sys cpu ticks
+    cat /proc/$java_pid/stat | cut -d " " -f 14 > cpu_ticks_${TAG}-${JDK}-${I}_${FORK}.txt
+    # merge all request sender threads
+    for FORK in $(seq $THREADS);
+    do
+      cat results_${TAG}-${JDK}-${I}_${FORK}.csv >> results_${TAG}-${JDK}-${I}.csv
+    done
     echo "Killing $PID"
     pkill -P $PID
+    pkill pidstat
     sleep 1
   done
-  python percentiles.py ${TAG}-${JDK}.csv results_${TAG}-${JDK}-*.csv
+  python percentiles.py ${TAG}-${JDK}.csv results_${TAG}-${JDK}-?.csv
 }
 
 function checks () {
