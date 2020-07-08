@@ -55,7 +55,9 @@ function bench () {
       wait $pid
     done
     # grab user & sys cpu ticks
-    cat /proc/$java_pid/stat | cut -d " " -f 14 > cpu_ticks_${TAG}-${JDK}-${I}_${FORK}.txt
+    java_pid=$(pgrep java)
+    echo "java pid: $java_pid"
+    cat /proc/$java_pid/stat | cut -d " " -f 14 > cpu_ticks_${TAG}-${JDK}-${I}.txt
     # merge all request sender threads
     for FORK in $(seq $THREADS);
     do
