@@ -59,6 +59,7 @@ function bench () {
     echo "java pid: $java_pid"
     cat /proc/$java_pid/stat | cut -d " " -f 14 > cpu_ticks_${TAG}-${JDK}-${I}.txt
     # merge all request sender threads
+    true > results_${TAG}-${JDK}-${I}.csv
     for FORK in $(seq $THREADS);
     do
       cat results_${TAG}-${JDK}-${I}_${FORK}.csv >> results_${TAG}-${JDK}-${I}.csv
