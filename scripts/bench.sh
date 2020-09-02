@@ -62,6 +62,8 @@ function bench () {
     java_pid=$(pgrep java)
     echo "java pid: $java_pid"
     cat /proc/$java_pid/stat | cut -d " " -f 14 > ${CPU_TICKS_FILENAME}.txt
+    # truncate previous file because we are doing >>
+    true > ${RESULTS_FILENAME}.csv
     for FORK in $(seq $THREADS);
     do
       cat ${RESULTS_FILENAME}_${FORK}.csv >> ${RESULTS_FILENAME}.csv
