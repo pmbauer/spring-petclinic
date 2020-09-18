@@ -19,6 +19,7 @@ package org.springframework.samples.petclinic;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,25 +36,38 @@ public class PetClinicApplication {
 
 	private static final int NB_THREADS = Integer.getInteger("nbThreads", 0);
 
+	private static final int NB_EXTRA_STACK = Integer.getInteger("nbExtraStack", 0);
+
 	private static ExecutorService executor;
 
-	private static void fibo50() {
-		fibo(50);
+	private static void syntheticWork() {
+		Random r = new Random();
+		for (int i = 0; i < 1800; i++) {
+			LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
+			syntheticStack(NB_EXTRA_STACK, () -> {
+				int sum = 0;
+				for (int j = 0; j < 10; j++) {
+					sum += r.longs().limit(r.nextInt() % 1000000).sum();
+				}
+				System.out.printf("work: %d", sum);
+			});
+		}
 	}
 
-	private static int fibo(int n) {
-		if (n == 1) {
-			LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(30));
+	private static int syntheticStack(int n, Runnable r) {
+		if (n <= 0) {
+			r.run();
+			return 0;
 		}
-		return fibo(n - 1);
+		return syntheticStack(n - 1, r);
 	}
 
 	public static void main(String[] args) {
 		if (NB_THREADS > 0) {
 			executor = Executors.newFixedThreadPool(NB_THREADS);
-			System.out.printf("Thread pools created with %d\n", NB_THREADS);
+			System.out.printf("Thread pools created with threads:%d stack:%d\n", NB_THREADS, NB_EXTRA_STACK);
 			for (int i = 0; i < NB_THREADS; i++) {
-				executor.submit(PetClinicApplication::fibo50);
+				executor.submit(PetClinicApplication::syntheticWork);
 			}
 			System.out.println("Thread created");
 		}
