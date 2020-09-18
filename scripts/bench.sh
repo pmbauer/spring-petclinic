@@ -99,8 +99,6 @@ function checks () {
   fi
 }
 
-bench none zulu8
-bench ap zulu8
-bench jfr zulu8
-bench dd zulu8
-
+bench stackdepth_256 jdk11
+bench stackdepth_128 jdk11
+bench stackdepth_64  jdk11
