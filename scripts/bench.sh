@@ -99,6 +99,7 @@ function checks () {
   fi
 }
 
+bench stackdepth_512 jdk11
 bench stackdepth_256 jdk11
 bench stackdepth_128 jdk11
 bench stackdepth_64  jdk11

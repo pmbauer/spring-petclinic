@@ -36,25 +36,15 @@ public class PetClinicApplication {
 
 	private static final int NB_THREADS = Integer.getInteger("nbThreads", 0);
 
-	private static final int NB_EXTRA_STACK = Integer.getInteger("nbExtraStack", 0);
-
 	private static ExecutorService executor;
 
 	private static void syntheticWork() {
-		Random r = new Random();
-		for (int i = 0; i < 1800; i++) {
-			LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
-			syntheticStack(NB_EXTRA_STACK, () -> {
-				int sum = 0;
-				for (int j = 0; j < 10; j++) {
-					sum += r.longs().limit(r.nextInt() % 1000000).sum();
-				}
-				System.out.printf("work: %d", sum);
-			});
-		}
+		syntheticStack(50, () -> {
+			LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(30));
+		});
 	}
 
-	private static int syntheticStack(int n, Runnable r) {
+	static int syntheticStack(int n, Runnable r) {
 		if (n <= 0) {
 			r.run();
 			return 0;
@@ -65,7 +55,7 @@ public class PetClinicApplication {
 	public static void main(String[] args) {
 		if (NB_THREADS > 0) {
 			executor = Executors.newFixedThreadPool(NB_THREADS);
-			System.out.printf("Thread pools created with threads:%d stack:%d\n", NB_THREADS, NB_EXTRA_STACK);
+			System.out.printf("Thread pools created with threads:%d\n", NB_THREADS);
 			for (int i = 0; i < NB_THREADS; i++) {
 				executor.submit(PetClinicApplication::syntheticWork);
 			}

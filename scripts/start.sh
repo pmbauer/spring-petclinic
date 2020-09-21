@@ -32,6 +32,6 @@ fi
 export PATH=$PATH:$JAVA_HOME/bin
 export DD_TAGS="type:${1}"
 $JAVA_HOME/bin/java ${OPTIONS} \
-    -DnbThreads=200 \
-    -DextraStack=128 \
+    -DnbThreads=0 \
+    -DnbExtraStack=256 \
     -jar ../target/spring-petclinic-2.2.0.BUILD-SNAPSHOT.jar > out_petclinic.txt
